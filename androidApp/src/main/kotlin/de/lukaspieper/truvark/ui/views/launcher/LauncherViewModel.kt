@@ -26,6 +26,7 @@ import de.lukaspieper.truvark.domain.vault.VaultFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.any
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -58,6 +59,8 @@ public class LauncherViewModel(
     public val supportsBiometricUnlocking: Boolean by derivedStateOf {
         unlockingErrorText != R.string.biometric_unlocking_failed && biometricConfig?.vaultId == vaultConfig?.id
     }
+
+    public val isAnyDebuggingSettingEnabled: Flow<Boolean> = preferences.isAnyDebuggingSettingEnabled
 
     init {
         viewModelScope.launch(Dispatchers.IO) {

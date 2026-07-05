@@ -17,6 +17,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import de.lukaspieper.truvark.domain.crypto.BiometricConfig
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(name = "AppPreferences")
@@ -104,5 +105,14 @@ public class PersistentPreferences(context: Context) {
 
     public val allowScreenCapture: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[ALLOW_SCREEN_CAPTURE] ?: false
+    }
+
+    // Computed "preferences" based on other preferences
+
+    public val isAnyDebuggingSettingEnabled: Flow<Boolean> = combine(
+        loggingAllowed,
+        allowScreenCapture
+    ) { loggingAllowed, allowScreenCapture ->
+        loggingAllowed || allowScreenCapture
     }
 }

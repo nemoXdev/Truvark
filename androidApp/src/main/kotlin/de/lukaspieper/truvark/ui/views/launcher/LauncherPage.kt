@@ -8,6 +8,7 @@ package de.lukaspieper.truvark.ui.views.launcher
 
 import android.Manifest
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -18,54 +19,63 @@ import androidx.biometric.AuthenticationRequest.Biometric.Strength
 import androidx.biometric.AuthenticationResult
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.compose.rememberAuthenticationLauncher
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.LockOpen
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
@@ -77,6 +87,8 @@ import de.lukaspieper.truvark.Route
 import de.lukaspieper.truvark.SinglePaneRoute
 import de.lukaspieper.truvark.ui.controls.PasswordField
 import de.lukaspieper.truvark.ui.controls.SafeDrawingScaffold
+import de.lukaspieper.truvark.ui.controls.ShapedIcon
+import de.lukaspieper.truvark.ui.controls.ShapedImage
 import de.lukaspieper.truvark.ui.controls.SingleLineText
 import de.lukaspieper.truvark.ui.preview.PagePreviews
 import de.lukaspieper.truvark.ui.preview.PreviewHost
@@ -136,6 +148,7 @@ public fun LauncherPage(
         }
     })
 
+    val isAnyDebuggingSettingEnabled = viewModel.isAnyDebuggingSettingEnabled.collectAsStateWithLifecycle(false)
     LauncherView(
         notificationPermissionState = notificationPermissionState,
         state = viewModel.state,
@@ -166,11 +179,12 @@ public fun LauncherPage(
                 createVault = viewModel::createVault
             )
         },
+        isAnyDebuggingSettingEnabled = isAnyDebuggingSettingEnabled.value,
         modifier = modifier
     )
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LauncherView(
     notificationPermissionState: PermissionState?,
@@ -183,6 +197,7 @@ private fun LauncherView(
     navigateToSettings: () -> Unit,
     showBiometricPrompt: () -> Unit,
     setupDialog: @Composable () -> Unit,
+    isAnyDebuggingSettingEnabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     SafeDrawingScaffold(
@@ -195,52 +210,109 @@ private fun LauncherView(
         },
         modifier = modifier,
     ) { paddingValues ->
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = CenterHorizontally,
+        AdaptivePane(
+            firstPane = {
+                LauncherInfoCardPager(
+                    isAnyDebuggingSettingEnabled = isAnyDebuggingSettingEnabled,
+                    isVaultAvailable = vaultDisplayName.isNotBlank(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            secondPane = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .imePadding(),
+                    verticalArrangement = spacedBy(MaterialTheme.paddings.extraLarge),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Card(
+                        shape = MaterialTheme.shapes.extraLarge,
+                        modifier = Modifier.sizeIn(maxWidth = 550.dp)
+                    ) {
+                        if (notificationPermissionState?.status is PermissionStatus.Denied) {
+                            NotificationPermissionView(notificationPermissionState)
+                        } else {
+                            if (vaultDisplayName.isNotBlank()) {
+                                VaultUnlockCardView(
+                                    vaultDisplayName = vaultDisplayName,
+                                    biometricUnlockingSupported = biometricUnlockingSupported,
+                                    unlockingErrorText = unlockingErrorText,
+                                    unlockVaultWithPassword = unlockVaultWithPassword,
+                                    showBiometricPrompt = showBiometricPrompt
+                                )
+                            } else {
+                                NoVaultCardView()
+                            }
+                        }
+                    }
+
+                    if (notificationPermissionState?.status !is PermissionStatus.Denied) {
+                        val size = ButtonDefaults.MediumContainerHeight
+                        FilledTonalButton(
+                            onClick = { updateState(DIRECTORY_SELECTION) },
+                            modifier = Modifier
+                                .heightIn(size)
+                                .width(550.dp),
+                            contentPadding = ButtonDefaults.contentPaddingFor(size, hasStartIcon = true),
+                        ) {
+                            Icon(
+                                Icons.Outlined.FolderOpen,
+                                contentDescription = null,
+                                modifier = Modifier.size(ButtonDefaults.iconSizeFor(size)),
+                            )
+                            Spacer(Modifier.size(ButtonDefaults.iconSpacingFor(size)))
+                            Text(
+                                stringResource(R.string.create_or_open_vault),
+                                style = ButtonDefaults.textStyleFor(size)
+                            )
+                        }
+
+                        if (state in listOf(DIRECTORY_SELECTION, VAULT_CREATION, PROCESSING)) {
+                            setupDialog()
+                        }
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
+        )
+    }
+}
+
+@Composable
+private fun AdaptivePane(
+    firstPane: @Composable () -> Unit,
+    secondPane: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    val firstPaneContent = remember { movableContentOf { firstPane() } }
+    val secondPaneContent = remember { movableContentOf { secondPane() } }
+
+    if (isLandscape) {
+        Row(
+            horizontalArrangement = spacedBy(MaterialTheme.paddings.extraLarge),
+            modifier = modifier
         ) {
-            Card(
-                modifier = Modifier.sizeIn(maxWidth = 550.dp)
-            ) {
-                if (notificationPermissionState?.status is PermissionStatus.Denied) {
-                    NotificationPermissionView(notificationPermissionState)
-                } else {
-                    if (vaultDisplayName.isNotBlank()) {
-                        VaultUnlockCardView(
-                            vaultDisplayName = vaultDisplayName,
-                            biometricUnlockingSupported = biometricUnlockingSupported,
-                            unlockingErrorText = unlockingErrorText,
-                            unlockVaultWithPassword = unlockVaultWithPassword,
-                            showBiometricPrompt = showBiometricPrompt
-                        )
-                    } else {
-                        NoVaultCardView()
-                    }
-                }
-            }
-
-            if (notificationPermissionState?.status !is PermissionStatus.Denied) {
-                OutlinedButton(
-                    onClick = { updateState(DIRECTORY_SELECTION) },
-                    modifier = Modifier
-                        .align(CenterHorizontally)
-                        .padding(top = 32.dp)
-                ) {
-                    Icon(Icons.Outlined.FolderOpen, null)
-                    Text(
-                        text = stringResource(R.string.create_or_open_vault),
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-
-                if (state in listOf(DIRECTORY_SELECTION, VAULT_CREATION, PROCESSING)) {
-                    setupDialog()
-                }
-            }
+            Box(Modifier.weight(0.4f)) { firstPaneContent() }
+            Box(
+                Modifier
+                    .weight(0.6f)
+                    .align(Alignment.CenterVertically)
+            ) { secondPaneContent() }
+        }
+    } else {
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = modifier
+        ) {
+            firstPaneContent()
+            secondPaneContent()
         }
     }
 }
@@ -259,18 +331,43 @@ private fun NotificationPermissionView(notificationPermissionState: PermissionSt
             }
         }
 
+        val navigateToSettings by remember {
+            derivedStateOf {
+                requestPermissionCounter > 1 || (permissionRequestCompleted && !status.shouldShowRationale)
+            }
+        }
+
         Column(
             modifier = modifier.padding(all = MaterialTheme.paddings.large),
-            verticalArrangement = spacedBy(MaterialTheme.paddings.medium)
+            verticalArrangement = spacedBy(MaterialTheme.paddings.large),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(R.string.notification_permission_description),
-                textAlign = TextAlign.Justify,
-                style = MaterialTheme.typography.bodyMedium
+            ShapedIcon(
+                imageVector = Icons.Default.Notifications,
+                tint = MaterialTheme.colorScheme.primary,
+                shape = MaterialShapes.Sunny
             )
+
+            Column(
+                verticalArrangement = spacedBy(MaterialTheme.paddings.small),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.notification_permission_title),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = stringResource(R.string.notification_permission_description),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             Button(
                 onClick = {
-                    if (requestPermissionCounter > 1 || (permissionRequestCompleted && !status.shouldShowRationale)) {
+                    if (navigateToSettings) {
                         context.startActivity(
                             Intent().apply {
                                 action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -282,15 +379,20 @@ private fun NotificationPermissionView(notificationPermissionState: PermissionSt
                         requestPermissionCounter++
                     }
                 },
+                shape = MaterialTheme.shapes.extraLarge,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Icon(
+                    imageVector = if (navigateToSettings) Icons.Default.Settings else Icons.Default.Notifications,
+                    contentDescription = null,
+                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                 Text(
-                    text = when {
-                        requestPermissionCounter > 1 || (permissionRequestCompleted && !status.shouldShowRationale) -> {
-                            stringResource(R.string.open_app_settings)
-                        }
-
-                        else -> stringResource(R.string.grant_permission)
+                    text = if (navigateToSettings) {
+                        stringResource(R.string.open_app_settings)
+                    } else {
+                        stringResource(R.string.grant_permission)
                     }
                 )
             }
@@ -300,25 +402,33 @@ private fun NotificationPermissionView(notificationPermissionState: PermissionSt
 
 @Composable
 private fun NoVaultCardView(modifier: Modifier = Modifier) {
-    Row(
-        horizontalArrangement = spacedBy(MaterialTheme.paddings.large),
-        modifier = modifier
-            .height(IntrinsicSize.Min)
-            .padding(MaterialTheme.paddings.large)
+    Column(
+        verticalArrangement = spacedBy(MaterialTheme.paddings.large),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.padding(MaterialTheme.paddings.large)
     ) {
-        Image(
+        ShapedImage(
             painter = painterResource(R.drawable.ic_locker),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxHeight()
-                .sizeIn(minHeight = 80.dp, maxWidth = 80.dp)
+            background = MaterialTheme.colorScheme.primaryContainer,
+            shape = MaterialShapes.Cookie12Sided
         )
-        Text(
-            text = stringResource(R.string.no_existing_vault_info),
-            textAlign = TextAlign.Justify,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.align(Alignment.CenterVertically)
-        )
+
+        Column(
+            verticalArrangement = spacedBy(MaterialTheme.paddings.small),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.no_vault_found_title),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = stringResource(R.string.no_existing_vault_info),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -333,39 +443,47 @@ private fun VaultUnlockCardView(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .height(100.dp)
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(MaterialTheme.paddings.extraLarge)
     ) {
-        Image(
+        ShapedImage(
             painter = painterResource(R.drawable.ic_locker),
-            contentDescription = null,
-            modifier = Modifier.padding(MaterialTheme.paddings.extraLarge)
+            background = MaterialTheme.colorScheme.primaryContainer,
+            shape = MaterialShapes.Cookie12Sided
         )
+        Spacer(Modifier.width(MaterialTheme.paddings.large))
         SingleLineText(
             text = vaultDisplayName,
-            modifier = Modifier.padding(end = MaterialTheme.paddings.large),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.headlineLarge
         )
     }
 
     Column(
-        verticalArrangement = spacedBy(MaterialTheme.paddings.medium),
+        verticalArrangement = spacedBy(MaterialTheme.paddings.large),
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(MaterialTheme.paddings.large)
     ) {
-        PasswordUnlockView(unlockVaultWithPassword, unlockingErrorText)
+        Column(
+            verticalArrangement = spacedBy(MaterialTheme.paddings.medium),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            PasswordUnlockView(unlockVaultWithPassword, unlockingErrorText)
 
-        if (biometricUnlockingSupported) {
-            Button(
-                onClick = showBiometricPrompt,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = stringResource(R.string.biometric_unlocking),
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Icon(Icons.Default.Fingerprint, null)
+            if (biometricUnlockingSupported) {
+                Button(
+                    onClick = showBiometricPrompt,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Fingerprint,
+                        contentDescription = null,
+                        modifier = Modifier.size(ButtonDefaults.IconSize)
+                    )
+                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(text = stringResource(R.string.biometric_unlocking))
+                }
             }
         }
     }
@@ -378,14 +496,14 @@ private fun PasswordUnlockView(
 ) {
     if (errorMessageResource != null && errorMessageResource != R.string.incorrect_password) {
         Surface(
-            shape = CardDefaults.shape,
+            shape = MaterialTheme.shapes.large,
             color = MaterialTheme.colorScheme.errorContainer,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = stringResource(errorMessageResource),
                 color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(MaterialTheme.paddings.small)
+                modifier = Modifier.padding(MaterialTheme.paddings.medium)
             )
         }
     }
@@ -441,7 +559,8 @@ private fun NoNotificationPermissionPreview() = PreviewHost {
         unlockVaultWithPassword = {},
         navigateToSettings = {},
         showBiometricPrompt = {},
-        setupDialog = {}
+        setupDialog = {},
+        isAnyDebuggingSettingEnabled = true
     )
 }
 
@@ -459,7 +578,8 @@ private fun NoVaultSelectedPreview() = PreviewHost {
         unlockVaultWithPassword = {},
         navigateToSettings = {},
         showBiometricPrompt = {},
-        setupDialog = {}
+        setupDialog = {},
+        isAnyDebuggingSettingEnabled = false
     )
 }
 
@@ -477,6 +597,7 @@ private fun VaultSelectedPreview() = PreviewHost {
         unlockVaultWithPassword = {},
         navigateToSettings = {},
         showBiometricPrompt = {},
-        setupDialog = {}
+        setupDialog = {},
+        isAnyDebuggingSettingEnabled = true
     )
 }

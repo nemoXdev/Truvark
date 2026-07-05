@@ -33,12 +33,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <string name="vault_using_biometric_unlocking">This vault is configured for biometric unlocking.</string>
     <string name="create_new_folder">Create new folder</string>
     <string name="folder_name">Folder name</string>
-    <string name="no_existing_vault_info">Could not load your last used vault. Create a new vault or open an existing one.</string>
+    <string name="no_existing_vault_info">Create a new vault or open an existing one to get started.</string>
+    <string name="no_vault_found_title">No vault found</string>
     <string name="biometric_unlocking_failed">Biometric unlock failed! Please use your password to unlock the vault.</string>
     <string name="delete_warning">You are about to delete the selected files and folders. This cannot be undone!</string>
     <string name="confirm_deletion">Confirm deletion</string>
     <string name="encrypted_file_not_found">Encrypted file not found!</string>
-    <string name="notification_permission_description">Notifications are required to encrypt and decrypt files in the background and show progress. Please grant permission to use this application. Only non intrusive notifications are used. You can even hide them in the application settings, but please keep the notification permission granted.</string>
+    <string name="notification_permission_description">Required for background encryption and decryption. Only low-priority progress notifications are shown.</string>
+    <string name="notification_permission_title">Notifications required</string>
     <string name="grant_permission">Grant permission</string>
     <string name="open_app_settings">Open app settings</string>
     <string name="fit_images_to_match_screen">Fit images to match screen size</string>
@@ -70,4 +72,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <string name="logging_description">Write to system log (\"logcat\")</string>
     <string name="allow_screen_capture">Allow screen capture</string>
     <string name="allow_screen_capture_description">Allows screenshots and screen recordings</string>
+    <string name="info_card_debugging_title">Debugging functionality is enabled</string>
+    <string name="info_card_debugging_description">At least one debugging setting is on. If this was not intended, disable it before creating or unlocking a vault.</string>
+    <string name="info_card_backup_title">Got a backup?</string>
+    <string name="info_card_backup_description">Having a backup is crucial! Simply copy the vault folder you chose to another storage or cloud.</string>
+    <string name="info_card_feedback_title">Enjoying Truvark?</string>
+    <string name="info_card_feedback_description">Spreading the word or considering starring it on GitHub is very much appreciated. Thanks!</string>
 </resources>

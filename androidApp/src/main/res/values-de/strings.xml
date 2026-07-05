@@ -35,12 +35,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <string name="vault_using_biometric_unlocking">Dieser Tresor ist für das biometrische Entsperren konfiguriert.</string>
     <string name="create_new_folder">Neuen Ordner erstellen</string>
     <string name="folder_name">Ordnername</string>
-    <string name="no_existing_vault_info">Der zuletzt verwendete Tresor konnte nicht gefunden werden. Öffne einen vorhandenen Tresor oder erstelle einen neuen.</string>
+    <string name="no_existing_vault_info">Erstelle einen neuen Tresor oder öffne einen vorhandenen, um loszulegen.</string>
+    <string name="no_vault_found_title">Kein Tresor gefunden</string>
     <string name="biometric_unlocking_failed">Biometrisches Entsperren fehlgeschlagen! Bitte Passwort verwenden.</string>
     <string name="confirm_deletion">Löschen bestätigen</string>
     <string name="delete_warning">Du bist dabei die ausgewählten Dateien und Ordner zu löschen. Dies kann nicht rückgängig gemacht werden!</string>
     <string name="encrypted_file_not_found">Verschlüsselte Datei nicht gefunden!</string>
-    <string name="notification_permission_description">Benachrichtigungen werden benötigt, um im Hintergrund zu ver- und entschlüsseln, sowie den Fortschritt anzuzeigen. Bitte lass die Berechtigung zu, um diese App zu verwenden. Es werden nur Benachrichtigungen mit niedriger Priorität verwendet.</string>
+    <string name="notification_permission_description">Erforderlich für die Ver- und Entschlüsselung im Hintergrund. Es werden nur Benachrichtigungen mit niedriger Priorität angezeigt.</string>
+    <string name="notification_permission_title">Benachrichtigungen erforderlich</string>
     <string name="grant_permission">Berechtigung zulassen</string>
     <string name="open_app_settings">App-Einstellungen öffnen</string>
     <string name="fit_images_to_match_screen">Bilder an Displaygröße anpassen</string>
@@ -72,4 +74,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <string name="logging_description">Ins Systemprotokoll schreiben („logcat“)</string>
     <string name="allow_screen_capture">Bildschirmaufzeichnung erlauben</string>
     <string name="allow_screen_capture_description">Erlaubt Screenshots und Bildschirmaufnahmen</string>
+    <string name="info_card_debugging_title">Eine Debugging-Funktion ist aktiviert</string>
+    <string name="info_card_debugging_description">Mindestens eine Fehlersuche-Einstellung ist aktiviert. Wenn das nicht beabsichtigt war, deaktiviere sie vor dem Erstellen oder Entsperren eines Tresors.</string>
+    <string name="info_card_backup_title">Backup vorhanden?</string>
+    <string name="info_card_backup_description">Eine Sicherungskopie ist unverzichtbar! Kopiere einfach den ausgewählten Ordner an einen anderen Speicherort oder in die Cloud.</string>
+    <string name="info_card_feedback_title">Gefällt dir Truvark?</string>
+    <string name="info_card_feedback_description">Das Weiterverbreiten oder ein Sternchen auf GitHub wäre sehr nett. Danke!</string>
 </resources>
