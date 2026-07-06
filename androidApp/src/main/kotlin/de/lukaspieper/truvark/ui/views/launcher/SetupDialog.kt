@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -86,6 +87,7 @@ public fun SetupDialog(
                 painter = painterResource(R.drawable.ic_vault_filesystem),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                 contentDescription = null,
+                alignment = Alignment.CenterStart,
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth()
