@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.RoundedPolygon
 import de.lukaspieper.truvark.R
@@ -61,12 +62,13 @@ public fun ShapedIcon(
     imageVector: ImageVector,
     tint: Color,
     modifier: Modifier = Modifier,
-    shape: RoundedPolygon = MaterialShapes.Circle
+    shape: RoundedPolygon = MaterialShapes.Circle,
+    size: Dp = 48.dp
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(48.dp)
+            .size(size)
             .clip(shape.toShape())
             .background(tint.copy(alpha = 0.16f))
     ) {
@@ -74,7 +76,7 @@ public fun ShapedIcon(
             imageVector = imageVector,
             contentDescription = null,
             tint = tint,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(size / 2)
         )
     }
 }

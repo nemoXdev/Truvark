@@ -12,16 +12,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,12 +30,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.lukaspieper.truvark.R
+import de.lukaspieper.truvark.ui.controls.InfoCard
+import de.lukaspieper.truvark.ui.controls.InfoCardState
 import de.lukaspieper.truvark.ui.controls.PasswordField
 import de.lukaspieper.truvark.ui.preview.ElementPreviews
 import de.lukaspieper.truvark.ui.preview.PreviewHost
@@ -58,15 +55,25 @@ public fun BiometricsView(
     if (biometricsStatus == BiometricManager.BIOMETRIC_SUCCESS) {
         CardSettingsSection(
             title = stringResource(R.string.biometric_unlocking),
+            header = {
+                if (isVaultUsingBiometricUnlocking) {
+                    InfoCard(
+                        state = InfoCardState(
+                            title = R.string.vault_using_biometric_unlocking,
+                            icon = Icons.Outlined.Check,
+                            iconSize = 32.dp,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
             modifier = modifier
         ) {
             Column(
                 verticalArrangement = spacedBy(MaterialTheme.paddings.medium),
             ) {
-                if (isVaultUsingBiometricUnlocking) {
-                    ActiveBiometricsIndicator()
-                }
-
                 Text(
                     text = stringResource(R.string.setup_biometrics_description),
                     style = MaterialTheme.typography.bodyMedium,
@@ -123,34 +130,6 @@ private fun SetupBiometricUnlockingView(
             modifier = Modifier.height(TextFieldDefaults.MinHeight)
         ) {
             Icon(Icons.Default.LockOpen, null)
-        }
-    }
-}
-
-@Composable
-private fun ActiveBiometricsIndicator() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        shape = MaterialTheme.shapes.large,
-    ) {
-        Row(
-            horizontalArrangement = spacedBy(MaterialTheme.paddings.medium),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(MaterialTheme.paddings.large)
-        ) {
-            Icon(
-                Icons.Outlined.CheckCircle,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.requiredSize(24.dp)
-            )
-
-            Text(
-                text = stringResource(R.string.vault_using_biometric_unlocking),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
         }
     }
 }

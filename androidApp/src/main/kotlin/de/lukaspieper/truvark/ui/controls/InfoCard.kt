@@ -22,15 +22,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import de.lukaspieper.truvark.ui.theme.paddings
 
 @Composable
 public fun InfoCard(
-    infoCardState: InfoCardState,
+    state: InfoCardState,
     modifier: Modifier = Modifier
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = infoCardState.containerColor),
+        colors = CardDefaults.cardColors(containerColor = state.containerColor),
         modifier = modifier
     ) {
         Row(
@@ -39,23 +41,27 @@ public fun InfoCard(
             modifier = Modifier.padding(MaterialTheme.paddings.large)
         ) {
             ShapedIcon(
-                imageVector = infoCardState.icon,
-                tint = infoCardState.contentColor
+                imageVector = state.icon,
+                size = state.iconSize,
+                tint = state.contentColor
             )
 
             Column(
                 verticalArrangement = spacedBy(MaterialTheme.paddings.small)
             ) {
                 Text(
-                    text = stringResource(infoCardState.title),
+                    text = stringResource(state.title),
                     style = MaterialTheme.typography.titleSmall,
-                    color = infoCardState.contentColor
+                    color = state.contentColor
                 )
-                Text(
-                    text = stringResource(infoCardState.description),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = infoCardState.contentColor
-                )
+
+                if (state.description != null) {
+                    Text(
+                        text = stringResource(state.description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = state.contentColor
+                    )
+                }
             }
         }
     }
@@ -64,8 +70,9 @@ public fun InfoCard(
 @Immutable
 public data class InfoCardState(
     @StringRes val title: Int,
-    @StringRes val description: Int,
+    @StringRes val description: Int? = null,
     val icon: ImageVector,
+    val iconSize: Dp = 48.dp,
     val containerColor: Color,
     val contentColor: Color
 )

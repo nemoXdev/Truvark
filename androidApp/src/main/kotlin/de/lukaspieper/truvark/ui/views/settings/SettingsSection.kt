@@ -43,6 +43,7 @@ public fun SettingsSection(
 public fun CardSettingsSection(
     title: String,
     modifier: Modifier = Modifier,
+    header: @Composable () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     Column(
@@ -50,6 +51,8 @@ public fun CardSettingsSection(
         modifier = modifier
     ) {
         SettingsSectionText(text = title)
+
+        header()
 
         Card(
             modifier = Modifier.fillMaxWidth(),

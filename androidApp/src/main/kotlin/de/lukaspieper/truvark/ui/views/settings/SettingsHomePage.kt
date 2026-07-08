@@ -38,10 +38,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import de.lukaspieper.truvark.DetailPaneRoute
 import de.lukaspieper.truvark.ListPaneRoute
 import de.lukaspieper.truvark.R
+import de.lukaspieper.truvark.ui.controls.ShapedIcon
 import de.lukaspieper.truvark.ui.controls.SingleLineText
 import de.lukaspieper.truvark.ui.extensions.exclude
 import de.lukaspieper.truvark.ui.preview.PagePreviews
@@ -111,7 +113,13 @@ public fun SettingsHomePage(
                     shapes = roundShape,
                     colors = if (isVaultSettingsSelected) selectedColors else defaultColors,
                     enabled = !isVaultSettingsSelected && route.vaultId != null,
-                    leadingContent = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    leadingContent = {
+                        ShapedIcon(
+                            imageVector = Icons.Default.Lock,
+                            tint = MaterialTheme.colorScheme.primary,
+                            size = 42.dp
+                        )
+                    },
                     content = { Text(stringResource(R.string.vault)) },
                     supportingContent = { SingleLineText(stringResource(R.string.settings_description_vault)) },
                 )
@@ -122,7 +130,13 @@ public fun SettingsHomePage(
                     shapes = roundShape,
                     colors = if (isAppSettingsSelected) selectedColors else defaultColors,
                     enabled = !isAppSettingsSelected,
-                    leadingContent = { Icon(Icons.Default.AppSettingsAlt, contentDescription = null) },
+                    leadingContent = {
+                        ShapedIcon(
+                            imageVector = Icons.Default.AppSettingsAlt,
+                            tint = MaterialTheme.colorScheme.primary,
+                            size = 42.dp
+                        )
+                    },
                     content = { Text(stringResource(R.string.app)) },
                     supportingContent = { SingleLineText(stringResource(R.string.settings_description_app)) },
                 )
@@ -134,7 +148,13 @@ public fun SettingsHomePage(
                         shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
                         colors = if (isLicensesSelected) selectedColors else defaultColors,
                         enabled = !isLicensesSelected,
-                        leadingContent = { Icon(Icons.Default.Copyright, contentDescription = null) },
+                        leadingContent = {
+                            ShapedIcon(
+                                imageVector = Icons.Default.Copyright,
+                                tint = MaterialTheme.colorScheme.tertiary,
+                                size = 42.dp
+                            )
+                        },
                         content = { Text(stringResource(R.string.settings_legal)) },
                         supportingContent = { SingleLineText(stringResource(R.string.settings_legal_description)) }
                     )
@@ -151,7 +171,13 @@ public fun SettingsHomePage(
                         },
                         shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
                         colors = defaultColors,
-                        leadingContent = { Icon(Icons.Default.Code, contentDescription = null) },
+                        leadingContent = {
+                            ShapedIcon(
+                                imageVector = Icons.Default.Code,
+                                tint = MaterialTheme.colorScheme.tertiary,
+                                size = 42.dp
+                            )
+                        },
                         content = { Text(stringResource(R.string.settings_repository)) },
                         supportingContent = {
                             SingleLineText(stringResource(R.string.settings_repository_description))
