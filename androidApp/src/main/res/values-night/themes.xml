@@ -10,8 +10,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <item name="windowSplashScreenBackground">@color/background_dark</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
 
-        <item name="postSplashScreenTheme">@style/AppTheme</item>  # Required.
+        <item name="postSplashScreenTheme">@style/AppTheme</item> # Required.
     </style>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/background_dark</item> # For flag_secure recent screen.
+    </style>
 </resources>
