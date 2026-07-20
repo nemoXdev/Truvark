@@ -24,6 +24,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <string name="delete">حذف</string>
     <string name="file_not_supported_info">هذا التنسيق غير مدعوم بعد. يمكنك ببساطة فك تشفير الملف عند الحاجة.</string>
     <string name="create_or_open_vault">إنشاء أو فتح خزنة</string>
+    <string name="clear">مسح</string>
     <string name="settings">الإعدادات</string>
     <string name="vault">الخزنة</string>
     <string name="app">التطبيق</string>
@@ -49,6 +50,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <string name="create_vault">إنشاء خزنة</string>
     <string name="create">إنشاء</string>
     <string name="error_unlocking_vault">تعذر فتح الخزنة.</string>
+    <string name="confirm_lock_vault">أعد الإدخال لقفل الخزنة.</string>
     <string name="decrypted_files">تم الانتهاء من فك تشفير الملفات</string>
     <string name="open_directory">فتح المجلد</string>
     <string name="relocating_files">نقل الملفات</string>
